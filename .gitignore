@@ -1,7 +1,19 @@
 __pycache__/
 *.pyc
-cache/
+
+# keep cache contents out, allow samples and folder
+cache/*
+!cache/.gitkeep
 !cache/*.sample.json
+
 .env
-corp.pem
 .idea/
+
+# keep real certs out
+*.pem
+!*.sample.pem
+*.pem
+!*.sample.pem
+cache/*
+!cache/.gitkeep
+!cache/*.sample.json
