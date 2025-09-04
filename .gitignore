@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 cache/
+!cache/*.sample.json
 .env
 corp.pem
 .idea/
