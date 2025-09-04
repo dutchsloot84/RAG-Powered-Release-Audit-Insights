@@ -1,0 +1,26 @@
+HTTP/1.1 401 Unauthorized
+Content-Type: text/html;charset=UTF-8
+Content-Length: 53
+Connection: keep-alive
+Date: Thu, 04 Sep 2025 20:03:50 GMT
+Server: AtlassianEdge
+Timing-Allow-Origin: *
+X-Arequestid: 359dae14d5bf2951ffd86879c898b66f
+Set-Cookie: atlassian.xsrf.token=a86a5bdae17314b9dfe50c3be44287d4ce8775bb_lout; Path=/; SameSite=None; Secure
+Cache-Control: no-cache, no-store, no-transform
+Www-Authenticate: OAuth realm="https%3A%2F%2Fcsaaig.atlassian.net"
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+X-Xss-Protection: 1; mode=block
+Atl-Traceid: e0cbb0dab73e4d1cae71e15c030b5894
+Atl-Request-Id: e0cbb0da-b73e-4d1c-ae71-e15c030b5894
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+Report-To: {"endpoints": [{"url": "https://dz8aopenkvv6s.cloudfront.net"}], "group": "endpoint-1", "include_subdomains": true, "max_age": 600}
+Nel: {"failure_fraction": 0.001, "include_subdomains": true, "max_age": 600, "report_to": "endpoint-1"}
+Server-Timing: atl-edge;dur=121,atl-edge-internal;dur=13,atl-edge-upstream;dur=108,atl-edge-pop;desc="aws-us-west-2"
+X-Cache: Error from cloudfront
+Via: 1.1 b3707aef923427d5b3d151dd164d8930.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: PHX52-P1
+X-Amz-Cf-Id: H-LgQRN1M0-tcs-ay7d9Jfn0tqaSxBl_BHtvz0jaaD29XtzPXjJ4Rg==
+
+Client must be authenticated to access this resource.
