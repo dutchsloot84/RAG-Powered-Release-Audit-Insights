@@ -23,10 +23,20 @@ entry points, caching, and optional LLM-powered summaries.
 
 ```bash
 cp .env.example .env  # populate tokens and base URLs
-# place corporate certificate as corp.pem in project root
 make install
 make run  # launches Streamlit on http://localhost:8501
 ```
+
+The Docker image includes the corporate CA bundle. `PEM_PATH` is optional and
+only needed if you must override the system certificates.
+
+### First Run Checklist
+
+1. Fill in `.env` with Jira, Bitbucket, and OpenAI credentials.
+2. `make run` or `docker compose up --build`.
+3. In the UI, open **Configuration** and **Connection Status** to verify
+   settings and connectivity.
+4. Provide JQL, repositories, and branches, then run the audit.
 
 ### Example JQL
 
@@ -39,15 +49,26 @@ project = SRNGR AND fixVersion = "Mobilitas 2025.09.19" ORDER BY updated DESC
 | Variable | Description |
 |----------|-------------|
 | `JIRA_BASE_URL` | Base URL to the Jira instance |
-| `JIRA_TOKEN` | Jira personal access token |
+| `JIRA_EMAIL` | Jira account email for PAT auth |
+| `JIRA_API_TOKEN` | Jira API token for PAT auth |
+| `JIRA_TOKEN_FILE` | Path to Jira OAuth token JSON |
 | `BITBUCKET_BASE_URL` | Bitbucket Server base URL |
 | `BITBUCKET_TOKEN` | Bitbucket personal access token |
+| `DEFAULT_BITBUCKET_REPOS` | Comma-separated repos `PROJECT/slug` |
+| `DEFAULT_BRANCHES` | Comma-separated branches |
 | `RAPID_TOKEN_URL` | OAuth2 token endpoint for Rapid API |
 | `RAPID_CLIENT_ID` | OAuth2 client id |
 | `RAPID_CLIENT_SECRET` | OAuth2 client secret |
 | `OPENAI_API_KEY` | (Optional) OpenAI API key for LLM features |
 | `OPENAI_MODEL` | OpenAI model name (default `gpt-4o-mini`) |
-| `PEM_PATH` | Path to corporate PEM certificate |
+| `PEM_PATH` | (Optional) custom PEM to override system CA |
+
+Example defaults:
+
+```env
+DEFAULT_BITBUCKET_REPOS=STARSYSONE/policycenter,STARSYSONE/claimcenter
+DEFAULT_BRANCHES=develop,release/r-56.0
+```
 
 ## Deriving the Audit Window
 
@@ -72,7 +93,7 @@ docker-compose up --build
 
 Mounts:
 - `./cache` → `/app/cache`
-- `./corp.pem` → `/app/certs/corp.pem`
+- (Optional) mount `./corp.pem` → `/app/certs/corp.pem` and set `PEM_PATH`
 
 ## Testing & Linting
 
@@ -83,7 +104,7 @@ make test
 
 ## Troubleshooting
 
-- Ensure the PEM certificate exists at the path specified by `PEM_PATH`.
+- If using a custom PEM, ensure the file exists and `PEM_PATH` points to it.
 - Rate limit errors are automatically retried with backoff.
 - FAISS is optional; installation may fail on unsupported platforms.
 
