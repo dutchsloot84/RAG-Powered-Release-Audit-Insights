@@ -1,22 +1,14 @@
-.PHONY: install run test lint docker-build docker-up docker-down
+.PHONY: fmt test ui audit
 
-install:
-	pip install -r requirements.txt
-
-run:
-	streamlit run app/ui/ui_app.py
+fmt:
+black app tests main.py
+ruff app tests main.py --fix
 
 test:
-	pytest -q
+pytest -q
 
-lint:
-	python -m py_compile $(git ls-files '*.py')
+ui:
+streamlit run app/ui/ui_app.py
 
-docker-build:
-	docker build -t release-audit .
-
-docker-up:
-	docker-compose up
-
-docker-down:
-	docker-compose down
+audit:
+python main.py --jql "$(JQL)" --repos "$(REPOS)" --branches "$(BRANCHES)" --update-cache
