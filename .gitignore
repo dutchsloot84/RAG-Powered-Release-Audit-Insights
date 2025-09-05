@@ -12,8 +12,3 @@ cache/*
 # keep real certs out
 *.pem
 !*.sample.pem
-*.pem
-!*.sample.pem
-cache/*
-!cache/.gitkeep
-!cache/*.sample.json

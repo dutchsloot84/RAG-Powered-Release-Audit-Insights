@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from app.config import settings
 from app.core.audit_engine import run_audit
 from app.core.llm_client import (
     release_notes_summary,
@@ -15,27 +16,32 @@ from app.models import Commit, Issue
 st.set_page_config(page_title="Release Audit", layout="wide")
 
 
-def parse_repos(text: str):
-    pairs = []
-    for part in text.split(","):
-        part = part.strip()
-        if not part:
-            continue
-        repo, branch = part.split(":")
-        pairs.append((repo.strip(), branch.strip()))
-    return pairs
-
-
 def main():
     st.title("RAG-Based Release Audit")
-    jql = st.sidebar.text_input("JQL Query")
-    repo_text = st.sidebar.text_input("Bitbucket repos (proj/repo:branch)")
+    jql = st.sidebar.text_input("JQL Query", value=settings.jira.jql_default)
+    repos = st.sidebar.multiselect(
+        "Repositories",
+        options=settings.bitbucket.repos,
+        default=settings.bitbucket.repos,
+    )
+    branches = st.sidebar.multiselect(
+        "Branches",
+        options=settings.bitbucket.branch_defaults,
+        default=settings.bitbucket.branch_defaults,
+    )
+    start = st.sidebar.date_input("Start date", value=None)
+    end = st.sidebar.date_input("End date", value=None)
     refresh = st.sidebar.checkbox("Refresh Data")
-    if not jql or not repo_text:
-        st.info("Enter JQL and repositories to run the audit")
+    run = st.sidebar.button("Run audit")
+    if not run or not jql:
+        st.info("Enter parameters and run the audit")
         return
-    repo_pairs = parse_repos(repo_text)
-    data = run_audit(jql, repo_pairs, force_refresh=refresh)
+    repo_pairs = [
+        (f"{settings.bitbucket.project_key}/{r}", b) for r in repos for b in branches
+    ]
+    start_iso = start.isoformat() if hasattr(start, "isoformat") else None
+    end_iso = end.isoformat() if hasattr(end, "isoformat") else None
+    data = run_audit(jql, repo_pairs, start_iso, end_iso, force_refresh=refresh)
     issues = [Issue(**i) for i in data["issues"]]
     commits = [Commit(**c) for c in data["commits"]]
     match = data["matching"]

@@ -1,23 +1,40 @@
-import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 import yaml
 from dotenv import load_dotenv
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class BitbucketSettings(BaseModel):
+    project_key: str = "STARSYSONE"
+    repos: List[str] = [
+        "policycenter",
+        "claimcenter",
+        "billingcenter",
+        "contactmanager",
+    ]
+    branch_defaults: List[str] = ["develop"]
+    branch_pattern: str = "release/r-*"
+
+
+class JiraDefaults(BaseModel):
+    jql_default: str = ""
+
+
 class Settings(BaseSettings):
-    """Application configuration loaded from environment variables with
-    optional defaults provided by ``config.yaml``.
+    """Application configuration with optional ``config.yaml`` defaults.
 
     Environment variables take precedence over values defined in the YAML file
-    or ``.env``. Secrets should never be committed to the repository; see
-    ``.env.example`` for the expected variables."""
+    or ``.env``. Unknown keys from the YAML are ignored so that extending the
+    configuration does not break settings parsing."""
 
     jira_base_url: str = Field("", alias="JIRA_BASE_URL")
-    jira_token: str = Field("", alias="JIRA_TOKEN")
+    jira_email: str = Field("", alias="JIRA_EMAIL")
+    jira_api_token: str = Field("", alias="JIRA_API_TOKEN")
+    jira_token_file: Optional[str] = Field(None, alias="JIRA_TOKEN_FILE")
+
     bitbucket_base_url: str = Field("", alias="BITBUCKET_BASE_URL")
     bitbucket_token: str = Field("", alias="BITBUCKET_TOKEN")
 
@@ -34,8 +51,15 @@ class Settings(BaseSettings):
     threads: int = Field(4, alias="THREADS")
     faiss_enabled: bool = Field(False, alias="FAISS_ENABLED")
 
+    bitbucket: BitbucketSettings = BitbucketSettings()
+    jira: JiraDefaults = JiraDefaults()
+
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", frozen=True
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_prefix="",
+        extra="ignore",
+        frozen=True,
     )
 
 
@@ -44,8 +68,7 @@ def _load_yaml_defaults() -> Dict[str, Any]:
     if cfg_path.exists():
         with cfg_path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
-            # Convert keys to environment-like names for BaseSettings.
-            return {k.upper(): v for k, v in data.items()}
+            return data
     return {}
 
 

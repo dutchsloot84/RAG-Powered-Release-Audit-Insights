@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 
+from app.clients.auth_manager import jira_auth_header
 from app.clients.http_client import request_json
 from app.models import Issue
 from app.config import settings
@@ -12,7 +13,7 @@ def fetch_issues_by_jql(jql: str) -> List[Issue]:
     start_at = 0
     max_results = 50
     issues: List[Issue] = []
-    headers = {"Authorization": f"Bearer {settings.jira_token}"}
+    headers = jira_auth_header()
     while True:
         url = f"{settings.jira_base_url}/rest/api/2/search"
         params = {
@@ -30,7 +31,9 @@ def fetch_issues_by_jql(jql: str) -> List[Issue]:
                     description=fields.get("description"),
                     components=[c.get("name") for c in fields.get("components", [])],
                     fixversions=[v.get("name") for v in fields.get("fixVersions", [])],
-                    updated=datetime.strptime(fields.get("updated"), "%Y-%m-%dT%H:%M:%S.%f%z").replace(tzinfo=None),
+                    updated=datetime.strptime(
+                        fields.get("updated"), "%Y-%m-%dT%H:%M:%S.%f%z"
+                    ).replace(tzinfo=None),
                 )
             )
         start_at += max_results

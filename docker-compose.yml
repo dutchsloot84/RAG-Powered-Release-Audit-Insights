@@ -5,7 +5,8 @@ services:
     volumes:
       - ./cache:/app/cache
       - ./corp.pem:/app/certs/corp.pem:ro
-    ports:
-      - "8501:8501"
     environment:
       - PYTHONUNBUFFERED=1
+      - PEM_PATH=/app/certs/corp.pem
+    ports:
+      - "8501:8501"
