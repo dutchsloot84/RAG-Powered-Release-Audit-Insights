@@ -1,3 +1,4 @@
+version: '3.9'
 services:
   app:
     build: .
@@ -8,4 +9,15 @@ services:
       - .env
     volumes:
       - ./cache:/app/cache
+      # Optional: override system CA with a custom PEM
+      # - ./corp.pem:/app/certs/corp.pem:ro
+    # environment:
+    #   PEM_PATH: /app/certs/corp.pem
+    environment:
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8501/?healthz=1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
