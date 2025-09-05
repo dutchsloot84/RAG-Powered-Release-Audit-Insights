@@ -1,12 +1,11 @@
-version: '3.9'
 services:
   app:
     build: .
-    volumes:
-      - ./cache:/app/cache
-      - ./corp.pem:/app/certs/corp.pem:ro
-    environment:
-      - PYTHONUNBUFFERED=1
-      - PEM_PATH=/app/certs/corp.pem
+    container_name: release-audit
     ports:
       - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - ./cache:/app/cache
+    restart: unless-stopped
